@@ -1,7 +1,7 @@
 ---
 title: "R for OLS"
-author: "姓名"
-date: "3/6/2019"
+author: "Bill"
+date: "3/25/2019"
 output: 
   html_document: 
     toc: true
@@ -247,7 +247,7 @@ modelCoe2 <- tidy(model_2_coeftest)
 
 ```
 
-```{r, results="asis"}
+```{r, results='asis'}
 #一定要用 list
 stargazer(model_1, model_2, 
           se=list(
@@ -260,6 +260,10 @@ stargazer(model_1, model_2,
 
 
 ```{r}
-glance(model1)
+stargazer(model_1, model_2, 
+          se=list(model_1_coeftest[,"Std. Error"], model_2_coeftest[,2]),
+          type="html",
+          align=TRUE)
 ```
 
+##控制期刊類別(實驗經濟學)
