@@ -1,0 +1,147 @@
+---
+title: "4/17 ch4"
+author: "Bill"
+date: "2019年4月17日"
+output: html_document
+---
+
+```{r}
+library(dplyr)
+library(magrittr)
+library(AER)
+data("CigarettesSW")
+```
+
+as.tibble()
+```{r}
+ Cigarettessw1 <- CigarettesSW %>% as_tibble() #有沒有tibble沒差
+ CigarettesSW
+ Cigarettessw1
+```
+
+```{r}
+class(CigarettesSW)
+class(Cigarettessw1)
+```
+
+```{r}
+CigarettesSW %<>% as_tibble()
+
+```
+
+```{r}
+CigarettesSW %<>% filter(year=="1995") -> Cigarattessw111
+```
+
+```{r}
+CigarettesSW %<>% 
+  mutate(
+    rprice=price/cpi,
+    rincome=income/(population/cpi),
+    tdiff=(taxs-tax)/cpi
+  )
+CigarettesSW
+```
+
+```{r}
+model1<-log(packs) ~ log(rprice)                  #先把迴歸式存下來
+model2<-log(packs) ~ log(rprice) + log(rincome)
+```
+
+```{r}
+model2noConstant <- 
+  log(packs) ~ log(rprice) + log(rincome)+0 #沒有常數項
+```
+
+```{r}
+ols1<-lm(model1,CigarettesSW) #沒有HC
+ols2<-lm(model2,CigarettesSW) #有  HC
+```
+
+```{r}
+library(sandwich)
+library(lmtest)
+library(stargazer)
+
+#使用vcovHC函數來計算HC1型的異質變異（即橫斷面資料下的線性迴歸模型）
+coeftest(ols1, vcov. = vcovHC, type="HC1") -> ols1_coeftest
+coeftest(ols2, vcov. = vcovHC, type="HC1") -> ols2_coeftest
+```
+
+
+```{r}
+ols1_coeftest
+ols2_coeftest
+```
+
+```{r result = "asis"}
+library(stargazer)
+stargazer(ols1,ols2,type="html")
+```
+
+
+```{r}
+tsls_1iv <- ivreg(
+  log(packs) ~ log(rprice) + log(rincome) | log(rincome) + tdiff,
+  data=CigarettesSW
+  ) 
+
+tsls_2iv <- ivreg(
+  log(packs) ~ log(rprice) + log(rincome) | log(rincome) + tdiff + I(tax/cpi),
+  data=CigarettesSW
+  )
+
+tsls_1iv
+tsls_2iv
+```
+
+```{r}
+library(broom)
+broom::glance(tsls_1iv)
+#broom::.....
+```
+
+```{r}
+class(tsls_1iv)
+summary(tsls_1iv)
+```
+
+```{r}
+summary(tsls_1iv, vcov = sandwich, diagnostics = TRUE, df=Inf) -> tsls_1iv_tests  #df=Infinity #  #後面一大串式屬於ivregr專屬
+summary(tsls_2iv, vcov = sandwich, diagnostics = TRUE, df=Inf) -> tsls_2iv_tests
+#summary(tsls_1iv, vcov = sandwich, diagnostics = TRUE, df=Inf)  #sargen test 排他性檢定 -> 無法進行，因為k=1(rinmcome), m=1(tdiff)
+summary(tsls_2iv, vcov = sandwich, diagnostics = TRUE, df=Inf)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
