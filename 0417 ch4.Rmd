@@ -114,6 +114,15 @@ summary(tsls_2iv, vcov = sandwich, diagnostics = TRUE, df=Inf)
 ```
 
 
+```{r }
+stargazer(tsls_1iv,tsls_2iv,type="html",
+          column.labels = c("one IV", "two IVs"),
+          add.lines = list(c("TSLS tests p-value", "",""),
+                           c("Q1: Sargan","NA","0.5641"),
+                           c("Q2: Weak instruments","1.4e-08","<2e-16"),
+                           c("Q3: Wu-Hausman","0.263","0.0569")
+                           ))
+```
 
 
 
